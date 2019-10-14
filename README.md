@@ -1,7 +1,7 @@
 Welcome to the ExpressTanks3 App
 ==================================================
 
-This is the starting code for CSCI 333 = Computer Networking's ExpressTanks app.
+This is the starting code for CSCI 333 - Computer Networking's ExpressTanks app.
 
 What's Here
 -----------
