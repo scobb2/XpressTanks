@@ -1,8 +1,7 @@
-Welcome to the AWS CodeStar sample web application
+Welcome to the ExpressTanks3 App
 ==================================================
 
-This sample code helps get you started with a simple Express web application
-deployed by AWS Elastic Beanstalk and AWS CloudFormation.
+This is the starting code for CSCI 333 = Computer Networking's ExpressTanks app.
 
 What's Here
 -----------
@@ -10,30 +9,12 @@ What's Here
 This sample includes:
 
 * README.md - this file
-* .ebextensions/ - this directory contains the configuration files that
-  AWS Elastic Beanstalk will deploy your Express application
-* buildspec.yml - this file is used by AWS CodeBuild to package your project.
-* package.json - this file contains various metadata relevant to your Node.js
-  application such as dependencies
-* server.js - this file contains the code for your application
-* public/ - this directory contains static web assets used by your application
-* tests/ - this directory contains unit tests for your application
-* template.yml - this file contains the description of AWS resources used by AWS
-  CloudFormation to deploy your infrastructure
-* template-configuration.json - this file contains the project ARN with placeholders used for tagging resources with the project ID  
 
 
 Getting Started
 ---------------
 
-These directions assume you want to develop on your local computer, and not
-from the Amazon EC2 instance itself. If you're on the Amazon EC2 instance, the
-virtual environment is already set up for you, and you can start working on the
-code.
-
-To work on the sample code, you'll need to clone your project's repository to your
-local computer. If you haven't, do that first. You can find instructions in the
-AWS CodeStar user guide.
+Some paragraph on using the tank app
 
 1. Install Node.js on your computer.  For details on available installers visit
    https://nodejs.org/en/download/.
@@ -77,18 +58,7 @@ User Guide: http://docs.aws.amazon.com/codestar/latest/userguide/welcome.html
 
 Forum: https://forums.aws.amazon.com/forum.jspa?forumID=248
 
-How Do I Add Template Resources to My Project?
-------------------
-
-To add AWS resources to your project, you'll need to edit the `template.yml`
-file in your project's repository. You may also need to modify permissions for
-your project's worker roles. After you push the template change, AWS CodeStar
-and AWS CloudFormation provision the resources for you.
-
-See the AWS CodeStar user guide for instructions to modify your template:
-https://docs.aws.amazon.com/codestar/latest/userguide/how-to-change-project.html#customize-project-template
-
-What Should I Do Before Running My Project in Production?
+What Should I Do Before Running This Project in Production?
 ------------------
 
 AWS recommends you review the security best practices recommended by the framework
