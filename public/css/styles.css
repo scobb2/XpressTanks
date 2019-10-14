@@ -26,6 +26,7 @@ h1, h2, h3 {
 h1 {
   font-size: 3.5rem;
   margin-bottom: 0.5rem;
+  margin-left: .5rem;
 }
 
 a {
@@ -188,4 +189,10 @@ footer .footer-contents {
   .graphics {
     display: none;
   }
+}
+
+/* Tank Options */
+#sketch-holder
+{
+/*  margin: 20px; */
 }
