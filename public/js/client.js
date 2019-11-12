@@ -21,7 +21,12 @@ function setup() {
   // Set drawing parmameters
   rectMode(CENTER);
   textAlign(CENTER, CENTER);
-  win = { width: 600, height: 600 };
+
+  // Set window size and push to the main screen
+  // Good DEV size
+  //win = { width: 600, height: 600 };
+  // Good PROD size
+  win = { width: 900, height: 700 };
   var canvas = createCanvas(win.width, win.height);
   canvas.parent('sketch-holder');
 
