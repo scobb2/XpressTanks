@@ -10,6 +10,7 @@ var oldTankx, oldTanky, oldTankHeading;
 var fps = 60; // Frames per second
 var PlayerName = "";
 var DEBUG = 0;
+var loopCount = 0.0;  // Keep a running counter to handle animations
 
 // Initial Setup
 function setup() {
@@ -57,6 +58,12 @@ function setup() {
 function draw() {
     background(0);
 
+    // Loop counter
+    if(loopCount > 359*10000)
+      loopCount = 0;
+    else
+      loopCount++;
+
     // Process shots
     for (var i = shots.length - 1; i >= 0; i--) {
       shots[i].render();
@@ -95,6 +102,22 @@ function draw() {
             tanks[t].render();
         }
       }
+      
+      // Demo Spinning Power-Up
+      /*
+      push();
+        translate(win.width/2, win.height/2);
+        rotate(radians(this.loopCount));
+        fill(color(255, 204, 0));
+        strokeWeight(0);
+        rect(0, 0, 20, 20);
+        textAlign(CENTER);
+        fill(255);
+        stroke(255);
+        text("B", 0, 0);
+      pop();
+      */
+
     }
 
       // To keep this program from being too chatty => Only send server info if something has changed
