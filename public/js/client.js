@@ -108,13 +108,18 @@ function draw() {
       push();
         translate(win.width/2, win.height/2);
         rotate(radians(this.loopCount));
+        scale(cos(this.loopCount/40.0)+4.0);
         fill(color(255, 204, 0));
         strokeWeight(0);
-        rect(0, 0, 20, 20);
-        textAlign(CENTER);
-        fill(255);
-        stroke(255);
-        text("B", 0, 0);
+        rect(0, 0, 5, 5);
+        push();
+          rotate(radians(this.loopCount*-1));
+          scale(.4);
+          textAlign(CENTER, CENTER);
+          fill(255);
+          stroke(255);
+          text("P", 0, 0);
+        pop();
       pop();
       */
 
