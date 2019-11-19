@@ -2,8 +2,10 @@ var win;
 //var tank; // Just this instance of the tank
 let tanks = []; // All tanks in the game 
 let shots = []; // All shots in the game
+var socketID;
 var mytankid;
 var myTankIndex = -1;
+var buzz = undefined;
 
 var socket;
 var oldTankx, oldTanky, oldTankHeading;
@@ -14,6 +16,12 @@ var loopCount = 0.0;  // Keep a running counter to handle animations
 
 // Initial Setup
 function setup() {
+
+  
+  // Start the audio context on a click/touch event
+  userStartAudio().then(function() {
+    // Audio context is started
+  });
 
   // Get the Player
   PlayerName = document.getElementById('playerName').value;
@@ -52,6 +60,10 @@ function setup() {
     socketID = socket.io.engine.id;
     socket.emit('ClientNewJoin', socketID);
   });
+
+  // Create buzzsaw
+  buzz = new Buzzsaw(win.width/2, win.height/2, color(255, 204, 0));
+
 }
   
 // Draw the screen and process the position updates
@@ -88,11 +100,11 @@ function draw() {
           // Check for off screen and don't let it go any further
           if(tanks[t].pos.x < 0)
             tanks[t].pos.x = 0;
-            if(tanks[t].pos.x > win.width)
+          if(tanks[t].pos.x > win.width)
             tanks[t].pos.x = win.width;
-            if(tanks[t].pos.y < 0)
+          if(tanks[t].pos.y < 0)
             tanks[t].pos.y = 0;
-            if(tanks[t].pos.y > win.height)
+          if(tanks[t].pos.y > win.height)
             tanks[t].pos.y = win.height;
             
         }
@@ -103,6 +115,10 @@ function draw() {
         }
       }
       
+
+      // Temporary Buzzsaw
+      buzz.render(this.loopCount);
+      buzz.update(tanks[myTankIndex]);
       // Demo Spinning Power-Up
       /*
       push();
