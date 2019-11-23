@@ -14,13 +14,17 @@ var PlayerName = "";
 var DEBUG = 0;
 var loopCount = 0.0;  // Keep a running counter to handle animations
 
+// Sounds activated
+const soundLib = new sounds();
+
 // Initial Setup
 function setup() {
 
-  
   // Start the audio context on a click/touch event
   userStartAudio().then(function() {
-    // Audio context is started
+    // Audio context is started - Preload any needed sounds
+    soundLib.loadLibSound('saw');
+    soundLib.loadLibSound('cannon');
   });
 
   // Get the Player
@@ -54,6 +58,8 @@ function setup() {
   socket.on('ServerResetAll', ServerResetAll);
   socket.on('ServerMoveShot', ServerMoveShot);
   socket.on('ServerNewShot', ServerNewShot);
+  socket.on('ServerBuzzSawNewChaser', ServerBuzzSawNewChaser);
+  socket.on('ServerBuzzSawMove', ServerBuzzSawMove);
 
   // Join (or start) a new game
   socket.on('connect', function(data) {
@@ -61,9 +67,8 @@ function setup() {
     socket.emit('ClientNewJoin', socketID);
   });
 
-  // Create buzzsaw
-  buzz = new Buzzsaw(win.width/2, win.height/2, color(255, 204, 0));
-
+  // Create a new Buzz
+  buzz = new Buzzsaw(win.width/2, win.height/2, color('#ffdc49'));
 }
   
 // Draw the screen and process the position updates
@@ -115,30 +120,12 @@ function draw() {
         }
       }
       
-
       // Temporary Buzzsaw
-      buzz.render(this.loopCount);
-      buzz.update(tanks[myTankIndex]);
-      // Demo Spinning Power-Up
-      /*
-      push();
-        translate(win.width/2, win.height/2);
-        rotate(radians(this.loopCount));
-        scale(cos(this.loopCount/40.0)+4.0);
-        fill(color(255, 204, 0));
-        strokeWeight(0);
-        rect(0, 0, 5, 5);
-        push();
-          rotate(radians(this.loopCount*-1));
-          scale(.4);
-          textAlign(CENTER, CENTER);
-          fill(255);
-          stroke(255);
-          text("P", 0, 0);
-        pop();
-      pop();
-      */
-
+      if(buzz) {
+        buzz.render(this.loopCount);
+        buzz.update(tanks[myTankIndex]);
+        buzz.checkBuzzShot();
+      }
     }
 
       // To keep this program from being too chatty => Only send server info if something has changed
@@ -227,7 +214,8 @@ function draw() {
 
     // Server got new tank -- add it to the list
     function ServerNewTankAdd(data) {
-      console.log('New Tank: ' + data);
+      if(DEBUG && DEBUG==1)
+        console.log('New Tank: ' + data);
       
       // Add any tanks not yet in our tank array
       var tankFound = false;
@@ -328,3 +316,22 @@ function draw() {
       document.forms[0].submit();
 //      location.reload();
     }
+
+/************  Buzz Saw  ***************/
+
+  // Set the new target for Buzz
+  function ServerBuzzSawNewChaser(data) {
+  if(buzz) {
+      buzz.setTarget(data);
+  }
+}
+
+// Set the position of the Buzz saw
+function ServerBuzzSawMove(data) {
+  if(buzz) {
+    buzz.position.x = data.x;
+    buzz.position.y = data.y;
+    buzz.velocity.x = data.xvel;
+    buzz.velocity.y = data.yvel;
+  }
+}

@@ -10,10 +10,8 @@ class Buzzsaw {
         this.maxspeed = 3;    // Maximum speed
         this.maxforce = 0.02; // Maximum steering force
         this.color = color;
-
-        // Load the buzzsaw sound
-//        soundFormats('mp3', 'ogg', 'wav');
-//        this.buzzSound = loadSound('sounds/saw.mp3');
+        this.buzzSound = undefined;
+        this.targetTankIndex = -1;
     }
 
     // Forces go into acceleration
@@ -21,21 +19,52 @@ class Buzzsaw {
         this.acceleration.add(force);
     }
     
-    // Method to update location
-    update(target) {
-        // Update the steering toward the target
-        let steeringForce = this.seek(target.pos);
-        this.acceleration.add(steeringForce);
-        // Update velocity
-        this.velocity.add(this.acceleration);
-        // Limit speed
-        this.velocity.limit(this.maxspeed);
-        this.position.add(this.velocity);
-        // Reset acceleration to 0 each cycle
-        this.acceleration.mult(0);
+    // Allow the target to be set
+    setTarget(targetTankID) {
+        // Find the target tank ID
+        for(var i = 0; i < tanks.length; i++) {
+            if(tanks[i].tankid == targetTankID) {
+                this.targetTankIndex = i;
+                return;
+            }
+        }
+        this.targetTankIndex = -1;
+    }
 
-//        if (this.buzzSound && dist(this.position.x, this.position.y, target.pos.x, target.pos.y) < 20)
-//            buzzSound.play();
+
+    // Method to update location
+    update() {
+        // If target is designated and it's me calculate it!
+//        if(this.targetTankIndex > -1
+//             && this.targetTankIndex == myTankIndex) {
+            
+            let target = tanks[myTankIndex];
+            // Update the steering toward the target
+            let steeringForce = this.seek(target.pos);
+            this.acceleration.add(steeringForce);
+            // Update velocity
+            this.velocity.add(this.acceleration);
+            // Limit speed
+            this.velocity.limit(this.maxspeed);
+            this.position.add(this.velocity);
+            // Reset acceleration to 0 each cycle
+            this.acceleration.mult(0);
+
+            if(dist(this.position.x, this.position.y, target.pos.x, target.pos.y) < 20)
+                soundLib.playSound('saw');
+            
+            
+            // Send out position to all other clients (via server)
+            // only if I'm the follower and only every x frames
+            if(this.targetTankIndex > -1
+                && this.targetTankIndex == myTankIndex
+                && loopCount%1000) {
+                // Make a simple json object to send
+                let newPos = { x: this.position.x, y: this.position.y,
+                    xvel: this.velocity.x, yvel: this.velocity.y };
+                socket.emit('ClientBuzzSawMove', newPos);
+            }
+
     }
 
     // Render the shot to the screen
@@ -62,5 +91,15 @@ class Buzzsaw {
         let steer = p5.Vector.sub(desired, this.velocity);
         steer.limit(this.maxforce); // Limit to maximum steering force
         return steer;
+    }
+
+    checkBuzzShot() {
+        for(var i=0; i < shots.length; i++) {
+            if(dist(this.position.x, this.position.y, shots[i].pos.x, shots[i].pos.y) < 20) {
+                socket.emit('ClientBuzzSawHit');
+                return;
+            }
+
+        }
     }
 }
