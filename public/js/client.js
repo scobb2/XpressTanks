@@ -2,8 +2,10 @@ var win;
 //var tank; // Just this instance of the tank
 let tanks = []; // All tanks in the game 
 let shots = []; // All shots in the game
+var socketID;
 var mytankid;
 var myTankIndex = -1;
+var buzz = undefined;
 
 var socket;
 var oldTankx, oldTanky, oldTankHeading;
@@ -12,8 +14,20 @@ var PlayerName = "";
 var DEBUG = 0;
 var loopCount = 0.0;  // Keep a running counter to handle animations
 
+// Sounds activated
+const soundLib = new sounds();
+
 // Initial Setup
 function setup() {
+
+  // Start the audio context on a click/touch event
+  userStartAudio().then(function() {
+    // Audio context is started - Preload any needed sounds
+    soundLib.loadLibSound('saw');
+    soundLib.loadLibSound('cannon');
+    soundLib.loadLibSound('tankfire');
+    soundLib.loadLibSound('dpop');
+  });
 
   // Get the Player
   PlayerName = document.getElementById('playerName').value;
@@ -46,12 +60,17 @@ function setup() {
   socket.on('ServerResetAll', ServerResetAll);
   socket.on('ServerMoveShot', ServerMoveShot);
   socket.on('ServerNewShot', ServerNewShot);
+  socket.on('ServerBuzzSawNewChaser', ServerBuzzSawNewChaser);
+  socket.on('ServerBuzzSawMove', ServerBuzzSawMove);
 
   // Join (or start) a new game
   socket.on('connect', function(data) {
     socketID = socket.io.engine.id;
     socket.emit('ClientNewJoin', socketID);
   });
+
+  // Create a new Buzz
+  buzz = new Buzzsaw(win.width/2, win.height/2, color('#ffdc49'));
 }
   
 // Draw the screen and process the position updates
@@ -88,11 +107,11 @@ function draw() {
           // Check for off screen and don't let it go any further
           if(tanks[t].pos.x < 0)
             tanks[t].pos.x = 0;
-            if(tanks[t].pos.x > win.width)
+          if(tanks[t].pos.x > win.width)
             tanks[t].pos.x = win.width;
-            if(tanks[t].pos.y < 0)
+          if(tanks[t].pos.y < 0)
             tanks[t].pos.y = 0;
-            if(tanks[t].pos.y > win.height)
+          if(tanks[t].pos.y > win.height)
             tanks[t].pos.y = win.height;
             
         }
@@ -103,26 +122,12 @@ function draw() {
         }
       }
       
-      // Demo Spinning Power-Up
-      /*
-      push();
-        translate(win.width/2, win.height/2);
-        rotate(radians(this.loopCount));
-        scale(cos(this.loopCount/40.0)+4.0);
-        fill(color(255, 204, 0));
-        strokeWeight(0);
-        rect(0, 0, 5, 5);
-        push();
-          rotate(radians(this.loopCount*-1));
-          scale(.4);
-          textAlign(CENTER, CENTER);
-          fill(255);
-          stroke(255);
-          text("P", 0, 0);
-        pop();
-      pop();
-      */
-
+      // Temporary Buzzsaw
+      if(buzz) {
+        buzz.render(this.loopCount);
+        buzz.update(tanks[myTankIndex]);
+        buzz.checkBuzzShot();
+      }
     }
 
       // To keep this program from being too chatty => Only send server info if something has changed
@@ -156,6 +161,9 @@ function draw() {
       let newShot = { x: tanks[myTankIndex].pos.x, y: tanks[myTankIndex].pos.y, heading: tanks[myTankIndex].heading, 
         tankColor: tanks[myTankIndex].tankColor, shotid: shotid, tankid: tanks[myTankIndex].tankid };
       socket.emit('ClientNewShot', newShot);
+      // Play a shot sound
+      soundLib.playSound('tankfire');
+
       return;
     } else if (keyCode == RIGHT_ARROW) {  // Move Right
       tanks[myTankIndex].setRotation(0.1);
@@ -211,7 +219,8 @@ function draw() {
 
     // Server got new tank -- add it to the list
     function ServerNewTankAdd(data) {
-      console.log('New Tank: ' + data);
+      if(DEBUG && DEBUG==1)
+        console.log('New Tank: ' + data);
       
       // Add any tanks not yet in our tank array
       var tankFound = false;
@@ -312,3 +321,22 @@ function draw() {
       document.forms[0].submit();
 //      location.reload();
     }
+
+/************  Buzz Saw  ***************/
+
+  // Set the new target for Buzz
+  function ServerBuzzSawNewChaser(data) {
+  if(buzz) {
+      buzz.setTarget(data);
+  }
+}
+
+// Set the position of the Buzz saw
+function ServerBuzzSawMove(data) {
+  if(buzz) {
+    buzz.position.x = data.x;
+    buzz.position.y = data.y;
+    buzz.velocity.x = data.xvel;
+    buzz.velocity.y = data.yvel;
+  }
+}

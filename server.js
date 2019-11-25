@@ -6,6 +6,8 @@ const request = require('request');
 // Game items to remember
 var tanks = [];
 var shots = [];
+var buzzSawTarget = -1;
+var DEBUG = 0;
 
 // Set up the server
 // process.env.PORT is related to deploying on AWS
@@ -52,6 +54,7 @@ io.sockets.on('connection',
   // We are given a websocket object in our function
   function (socket) {
   
+    // Always print this
     console.log("New Tank: " + socket.id);
 
     // Initial Add of New Client
@@ -98,7 +101,8 @@ io.sockets.on('connection',
         if(!tankFound)
           tanks.push(newTank);
 
-          console.log(tanks);
+          if(DEBUG && DEBUG==1)
+            console.log(tanks);
 
         // Send the tank update after giving a quick delay for initialization
         const timeoutObj = setTimeout(() => {
@@ -107,9 +111,12 @@ io.sockets.on('connection',
           io.sockets.emit('ServerNewTankAdd', tanks);
         }, 1500);
 
-        // Send to all clients but sender socket
-//        socket.broadcast.emit('ServerNewTankAdd', tanks);
 
+        // If the buzzsaw target is not designated, set its target
+        if(buzzSawTarget < 0 && tanks.length > 0) {
+          this.buzzSawTarget = Math.floor(Math.random() * Math.floor(tanks.length));
+          io.sockets.emit('ServerBuzzSawNewChaser', tanks[this.buzzSawTarget].tankid);
+        }
       }
     );
 
@@ -119,7 +126,8 @@ io.sockets.on('connection',
       function(data) {
 
         // Data comes in as whatever was sent, including objects
-        console.log('Move Tank: ' + JSON.stringify(data));
+        if(DEBUG && DEBUG==1)
+          console.log('Move Tank: ' + JSON.stringify(data));
 
         // Change the local tank table
         if(tanks !== undefined) {
@@ -143,7 +151,9 @@ io.sockets.on('connection',
     socket.on('disconnect', function() {
       console.log("Client has disconnected: " + socket.id);
 
-      console.log(tanks);
+      if(DEBUG && DEBUG==1)
+        console.log(tanks);
+
         // Remove this tank
         for (var i = tanks.length - 1; i >= 0; i--) {
             if(tanks[i].tankid == socket.id) {
@@ -161,7 +171,8 @@ io.sockets.on('connection',
       function(data) {
 
         // Data comes in as whatever was sent, including objects
-        console.log('New Shot: ' + JSON.stringify(data));
+        if(DEBUG && DEBUG==1)
+          console.log('New Shot: ' + JSON.stringify(data));
 
         // Add this shot to the end of the array
         shots.push(data);
@@ -177,7 +188,8 @@ io.sockets.on('connection',
       function(data) {
 
         // Data comes in as whatever was sent, including objects
-        console.log('Move Shot: ' + JSON.stringify(data));
+        if(DEBUG && DEBUG==1)
+          console.log('Move Shot: ' + JSON.stringify(data));
 
         // Find the correct shot and save the index
         var i = 0;
@@ -201,18 +213,21 @@ io.sockets.on('connection',
             continue;
           else {
             var dist = Math.sqrt( Math.pow((shots[i].x-tanks[t].x), 2) + Math.pow((shots[i].y-tanks[t].y), 2) );
-            console.log('Dist.: ' + dist);
+            
+            if(DEBUG && DEBUG==1)
+              console.log('Dist.: ' + dist);
 
-            if(dist < 20) {
-              console.log('HIT ------------------------');
-              console.log('shotid: ' + shots[i].shotid);
-              console.log('Shot-tankid: ' + shots[i].tankid);
-              console.log('ShotX: ' + shots[i].x);
-              console.log('ShotY: ' + shots[i].y);
-              console.log('Tank-tankid: ' + tanks[t].tankid);
-              console.log('TankX: ' + tanks[t].x);
-              console.log('TankY: ' + tanks[t].y);
-                  
+            if(dist < 25) {
+              if(DEBUG && DEBUG==1) {
+                console.log('HIT ------------------------');
+                console.log('shotid: ' + shots[i].shotid);
+                console.log('Shot-tankid: ' + shots[i].tankid);
+                console.log('ShotX: ' + shots[i].x);
+                console.log('ShotY: ' + shots[i].y);
+                console.log('Tank-tankid: ' + tanks[t].tankid);
+                console.log('TankX: ' + tanks[t].x);
+                console.log('TankY: ' + tanks[t].y);
+              }
               // It was a hit, remove the tank and shot
               // and tell everyone else its gone too
               io.sockets.emit('ServerTankRemove', tanks[t].tankid);
@@ -231,7 +246,8 @@ io.sockets.on('connection',
       function(data) {
 
         // Data comes in as whatever was sent, including objects
-        console.log('Remove Shot: ' + JSON.stringify(data));
+        if(DEBUG && DEBUG==1)
+          console.log('Remove Shot: ' + JSON.stringify(data));
 
         // Get the shot to remove
         const shotid = data.shotid;
@@ -267,4 +283,22 @@ io.sockets.on('connection',
 
       });
     
+      /************  Buzz Saw  ***************/
+          // Connected client moving Shots
+    socket.on('ClientBuzzSawHit',
+    function() {
+
+      // Chase a different candidate for it to follow
+      if(tanks.length > 0) {
+        this.buzzSawTarget = Math.floor(Math.random() * Math.floor(tanks.length));
+        io.sockets.emit('ServerBuzzSawNewChaser', tanks[this.buzzSawTarget].tankid);
+      }
+    });
+
+    socket.on('ClientBuzzSawMove',
+    function(data) {
+        // Transmit the new coordinates right out to the other clients
+        // only send to the other clients (not the original sender)
+        socket.broadcast.emit('ServerBuzzSawMove', data);
+    });
   });
