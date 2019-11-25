@@ -25,6 +25,8 @@ function setup() {
     // Audio context is started - Preload any needed sounds
     soundLib.loadLibSound('saw');
     soundLib.loadLibSound('cannon');
+    soundLib.loadLibSound('tankfire');
+    soundLib.loadLibSound('dpop');
   });
 
   // Get the Player
@@ -159,6 +161,9 @@ function draw() {
       let newShot = { x: tanks[myTankIndex].pos.x, y: tanks[myTankIndex].pos.y, heading: tanks[myTankIndex].heading, 
         tankColor: tanks[myTankIndex].tankColor, shotid: shotid, tankid: tanks[myTankIndex].tankid };
       socket.emit('ClientNewShot', newShot);
+      // Play a shot sound
+      soundLib.playSound('tankfire');
+
       return;
     } else if (keyCode == RIGHT_ARROW) {  // Move Right
       tanks[myTankIndex].setRotation(0.1);

@@ -25,6 +25,11 @@ class Buzzsaw {
         for(var i = 0; i < tanks.length; i++) {
             if(tanks[i].tankid == targetTankID) {
                 this.targetTankIndex = i;
+
+                // Warn the user they are the target!
+                if(targetTankID==mytankid)
+                    soundLib.playSound('dpop');
+
                 return;
             }
         }

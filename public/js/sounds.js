@@ -19,7 +19,7 @@ class sounds {
         else {
             // Load the new sound
             soundFormats('mp3', 'wav');
-            let objSound = loadSound('sounds/' + soundName + '.mp3');
+            let objSound = loadSound('./sounds/' + soundName + '.mp3');
             var objSoundPack = {
                 'soundName': soundName,
                 'sound': objSound
@@ -36,6 +36,7 @@ class sounds {
         if(soundActivated.checked) {
             // If loaded and is not playing, play it
             if(this.loadedSounds[soundName] 
+                && this.loadedSounds[soundName].sound
                 && this.loadedSounds[soundName].sound.isLoaded())
 //                && !this.loadedSounds[soundName].sound.isPlaying())
                         this.loadedSounds[soundName].sound.play();

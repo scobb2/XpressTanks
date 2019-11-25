@@ -6,9 +6,6 @@ function Shot(shotid, tankid, spos, angle, color) {
     this.color = color;
     this.shotid = shotid;
     this.tankid = tankid;
-
-    // Play a shot sound
-    soundLib.playSound('cannon');
   
     this.update = function() {
       this.pos.add(this.vel);
