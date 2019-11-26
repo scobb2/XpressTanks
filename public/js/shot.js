@@ -2,7 +2,7 @@
 function Shot(shotid, tankid, spos, angle, color) {
     this.pos = createVector(spos.x, spos.y);
     this.vel = p5.Vector.fromAngle(angle);
-    this.vel.mult(4);
+    this.vel.mult(2);
     this.color = color;
     this.shotid = shotid;
     this.tankid = tankid;
