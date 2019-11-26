@@ -55,7 +55,7 @@ class Buzzsaw {
             // Reset acceleration to 0 each cycle
             this.acceleration.mult(0);
 
-            if(dist(this.position.x, this.position.y, target.pos.x, target.pos.y) < 20)
+            if(dist(this.position.x, this.position.y, target.pos.x, target.pos.y) < 20.0)
                 soundLib.playSound('saw');
             
             

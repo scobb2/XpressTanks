@@ -212,12 +212,17 @@ io.sockets.on('connection',
           if(shots[i].tankid == tanks[t].tankid)
             continue;
           else {
-            var dist = Math.sqrt( Math.pow((shots[i].x-tanks[t].x), 2) + Math.pow((shots[i].y-tanks[t].y), 2) );
-            
-            if(DEBUG && DEBUG==1)
-              console.log('Dist.: ' + dist);
 
-            if(dist < 25) {
+            var dist = Math.sqrt( Math.pow((shots[i].x-tanks[t].x), 2) + Math.pow((shots[i].y-tanks[t].y), 2) );
+
+//            var dist = dist(shots[i].x, shots[i].y, tanks[t].x, tanks[t].y);
+
+//            console.log('Dist: ' + dist);
+
+//            if(DEBUG && DEBUG==1)
+//              console.log('Dist.: ' + dist);
+
+            if(dist < 20.0) {
               if(DEBUG && DEBUG==1) {
                 console.log('HIT ------------------------');
                 console.log('shotid: ' + shots[i].shotid);
