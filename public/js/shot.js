@@ -2,7 +2,7 @@
 function Shot(shotid, tankid, spos, angle, color) {
     this.pos = createVector(spos.x, spos.y);
     this.vel = p5.Vector.fromAngle(angle);
-    this.vel.mult(10);
+    this.vel.mult(3);
     this.color = color;
     this.shotid = shotid;
     this.tankid = tankid;
@@ -14,8 +14,17 @@ function Shot(shotid, tankid, spos, angle, color) {
     // Render the shot to the screen
     this.render = function() {
       push();
-      stroke(this.color);
-      strokeWeight(8);
+
+      // Original shots
+      //      stroke(this.color);
+      //      strokeWeight(8);
+      //      point(this.pos.x, this.pos.y);
+
+      // New and improved shots
+      stroke(255);
+      fill(this.color);
+      strokeWeight(1);
+      ellipse(this.pos.x-2,this.pos.y-2,9,9);
       point(this.pos.x, this.pos.y);
       pop();
     }
