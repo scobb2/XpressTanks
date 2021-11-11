@@ -2,6 +2,8 @@
 var express = require('express');
 var app = express();
 const request = require('request');
+//const Hapi = require( "hapi" );
+//const routes = require( "./routes" );
 
 // Game items to remember
 var tanks = [];

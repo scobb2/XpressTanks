@@ -70,7 +70,7 @@ function setup() {
   });
 
   // Create a new Buzz
-  buzz = new Buzzsaw(win.width/2, win.height/2, color('#ffdc49'));
+//  buzz = new Buzzsaw(win.width/2, win.height/2, color('#ffdc49'));
 }
   
 // Draw the screen and process the position updates
