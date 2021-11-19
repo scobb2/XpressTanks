@@ -1,4 +1,5 @@
 
+const { Console } = require('console');
 var express = require('express');
 var app = express();
 const request = require('request');
@@ -195,36 +196,31 @@ io.sockets.on('connection',
 
         // Find the correct shot and save the index
         var i = 0;
+        var newValuex = data.x;
+        var newValuey = data.y;
         for(; i < shots.length; i++) {
           if(shots[i].shotid == data.shotid) {
-            shots[i].x = Number(data.x);
-            shots[i].y = Number(data.y);
+//            shots[i].x = Number(data.x);
+//            shots[i].y = Number(data.y);
             break;
           }
         }
         // Just make sure it found one
         if(shots[i]==undefined) return;
 
-        // Send the change out
-//        io.sockets.emit('ServerMoveShot', data);
-
         // Look for hits with all tanks
         for (var t = tanks.length - 1; t >= 0; t--) {
           // As long as it's not the tank that fired the shot
           if(shots[i].tankid == tanks[t].tankid)
             continue;
+
           else {
-
-            var dist = Math.sqrt( Math.pow((shots[i].x-tanks[t].x), 2) + Math.pow((shots[i].y-tanks[t].y), 2) );
-
-//            var dist = dist(shots[i].x, shots[i].y, tanks[t].x, tanks[t].y);
-
-//            console.log('Dist: ' + dist);
-
-//            if(DEBUG && DEBUG==1)
-//              console.log('Dist.: ' + dist);
-
-            if(dist < 20.0) {
+            // Check if the line between shot old location
+            // and shot new location is within the tank,
+            // if so, then the shot hit the tank
+            var targetSize = 10;
+            if(lineRect(shots[i].x, shots[i].y, newValuex, newValuey, 
+                tanks[t].x-targetSize, tanks[t].y-targetSize, targetSize*2, targetSize*2)) {
               if(DEBUG && DEBUG==1) {
                 console.log('HIT ------------------------');
                 console.log('shotid: ' + shots[i].shotid);
@@ -243,10 +239,48 @@ io.sockets.on('connection',
               // just return for now to keep from unknown errors
               return;
             }
+            else {
+              shots[i].x = newValuex;
+              shots[i].y = newValuey;
+            }
           }
         }
 
       });
+
+    // LINE/RECTANGLE Intersection Test
+    // Per this page: http://www.jeffreythompson.org/collision-detection/line-line.php
+    function lineRect(x1, y1, x2, y2, rx, ry, rw, rh) {
+
+      // check if the line has hit any of the rectangle's sides
+      // uses the Line/Line function below
+      var left =   lineLine(x1,y1,x2,y2, rx,    ry,    rx,    ry+rh);
+      var right =  lineLine(x1,y1,x2,y2, rx+rw, ry,    rx+rw, ry+rh);
+      var top =    lineLine(x1,y1,x2,y2, rx,    ry,    rx+rw, ry);
+      var bottom = lineLine(x1,y1,x2,y2, rx,    ry+rh, rx+rw, ry+rh);
+
+      // if ANY of the above are true, the line has hit the rectangle
+      if (left || right || top || bottom)
+        return true;
+      else
+        return false;
+    }
+
+
+    // LINE/LINE Intersetion Test
+    function lineLine(x1, y1, x2, y2, 
+                      x3, y3, x4, y4) {
+
+      // calculate the direction of the lines
+      let uA = ((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+      let uB = ((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+
+      // if uA and uB are between 0-1, lines are colliding
+      if (uA >= 0.0 && uA <= 1.0 && uB >= 0.0 && uB <= 1.0)
+        return true;
+      else
+        return false;
+    }
 
     // Connected client moving Shots
     socket.on('ClientRemoveShot',
