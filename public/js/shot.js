@@ -24,8 +24,8 @@ function Shot(shotid, tankid, spos, angle, color) {
       stroke(255);
       fill(this.color);
       strokeWeight(1);
-      ellipse(this.pos.x-2,this.pos.y-2,9,9);
-      point(this.pos.x, this.pos.y);
+      ellipse(this.pos.x-3,this.pos.y-3,6,6);
+//      point(this.pos.x, this.pos.y);
       pop();
     }
   
