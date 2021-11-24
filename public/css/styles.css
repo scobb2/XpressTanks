@@ -242,8 +242,9 @@ footer .footer-contents {
 
 /* Div Horizontal Alignment */
 .row {
-  width: 100%;
+  width: 90%;
   text-align: left;
+  margin-left: 20px;
 }
 
 .block {
@@ -251,7 +252,7 @@ footer .footer-contents {
 }​
 
 /* Tank Options */
-#sketch-holder
+.sketch-holder
 {
-/*  margin: 20px; */
+  margin-left: 20px;
 }

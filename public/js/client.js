@@ -40,7 +40,7 @@ function setup() {
 
   // Set window size and push to the main screen
   // Good DEV size
-  win = { width: 600, height: 600 };
+  win = { width: 800, height: 500 };
   // Good PROD size
 //  win = { width: 900, height: 700 };
   var canvas = createCanvas(win.width, win.height);
