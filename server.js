@@ -186,69 +186,6 @@ io.sockets.on('connection',
 
 
     // Connected client moving Shots
-    socket.on('ClientMoveShot',
-      function(data) {
-
-        // Data comes in as whatever was sent, including objects
-        if(DEBUG && DEBUG==1)
-          console.log('Move Shot: ' + JSON.stringify(data));
-
-        // Find the correct shot and save the index
-        var i = 0;
-        for(; i < shots.length; i++) {
-          if(shots[i].shotid == data.shotid) {
-            shots[i].x = Number(data.x);
-            shots[i].y = Number(data.y);
-            break;
-          }
-        }
-        // Just make sure it found one
-        if(shots[i]==undefined) return;
-
-        // Send the change out
-//        io.sockets.emit('ServerMoveShot', data);
-
-        // Look for hits with all tanks
-        for (var t = tanks.length - 1; t >= 0; t--) {
-          // As long as it's not the tank that fired the shot
-          if(shots[i].tankid == tanks[t].tankid)
-            continue;
-          else {
-
-            var dist = Math.sqrt( Math.pow((shots[i].x-tanks[t].x), 2) + Math.pow((shots[i].y-tanks[t].y), 2) );
-
-//            var dist = dist(shots[i].x, shots[i].y, tanks[t].x, tanks[t].y);
-
-//            console.log('Dist: ' + dist);
-
-//            if(DEBUG && DEBUG==1)
-//              console.log('Dist.: ' + dist);
-
-            if(dist < 20.0) {
-              if(DEBUG && DEBUG==1) {
-                console.log('HIT ------------------------');
-                console.log('shotid: ' + shots[i].shotid);
-                console.log('Shot-tankid: ' + shots[i].tankid);
-                console.log('ShotX: ' + shots[i].x);
-                console.log('ShotY: ' + shots[i].y);
-                console.log('Tank-tankid: ' + tanks[t].tankid);
-                console.log('TankX: ' + tanks[t].x);
-                console.log('TankY: ' + tanks[t].y);
-              }
-              // It was a hit, remove the tank and shot
-              // and tell everyone else its gone too
-              io.sockets.emit('ServerTankRemove', tanks[t].tankid);
-              tanks.splice(t,1);
-              shots.splice(i, 1);
-              // just return for now to keep from unknown errors
-              return;
-            }
-          }
-        }
-
-      });
-
-    // Connected client moving Shots
     socket.on('ClientRemoveShot',
       function(data) {
 

@@ -4,6 +4,7 @@ let tanks = []; // All tanks in the game
 let shots = []; // All shots in the game
 var socketID;
 var mytankid;
+let tankHitRadius = 20.0;
 var myTankIndex = -1;
 var buzz = undefined;
 
@@ -91,9 +92,28 @@ function draw() {
         shots.splice(i, 1);
       }
       else {
-        let shotData = { x: shots[i].pos.x, y: shots[i].pos.y, 
-          shotid: shots[i].shotid };
-        socket.emit('ClientMoveShot', shotData);
+        // Look for hits with all tanks
+        for (var t = tanks.length - 1; t >= 0; t--) {
+          // As long as it's not the tank that fired the shot
+          if(shots[i].tankid == tanks[t].tankid)
+            continue;
+          else {
+            var dist = Math.sqrt( Math.pow((shots[i].pos.x-tanks[t].pos.x), 2) + Math.pow((shots[i].pos.y-tanks[t].pos.y), 2) );
+            // It's a hit if within the radius of the tank
+            if(dist < tankHitRadius) {
+
+              // It was a hit, remove the tank and shot
+              // and tell everyone else its gone too
+              let shotData = { x: shots[i].pos.x, y: shots[i].pos.y, 
+                shotid: shots[i].shotid, tankid: shots[i].tankid };
+              socket.emit('ClientTankHit', shotData);
+              tanks[t].destroyed = true;
+              shots.splice(i, 1);
+              // just return for now to keep from unknown errors
+              return;
+            }
+          }
+        }
       }
     }
     // Process all the tanks by iterating through the tanks array
