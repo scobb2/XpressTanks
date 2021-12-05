@@ -175,22 +175,34 @@ function draw() {
       return;
 
     if (key == ' ') {                       // Fire Shell
-      const shotid = random(0, 50000);
-      shots.push(new Shot(shotid, tanks[myTankIndex].tankid, tanks[myTankIndex].pos, 
-        tanks[myTankIndex].heading, tanks[myTankIndex].tankColor));
-      let newShot = { x: tanks[myTankIndex].pos.x, y: tanks[myTankIndex].pos.y, heading: tanks[myTankIndex].heading, 
-        tankColor: tanks[myTankIndex].tankColor, shotid: shotid, tankid: tanks[myTankIndex].tankid };
-      socket.emit('ClientNewShot', newShot);
-      // Play a shot sound
-      soundLib.playSound('tankfire');
+      var shotsCount = 0
+      for(var i = 0; i < shots.length; i++) {
+        if (shots[i].tankid == mytankid) {
+            shotsCount++
+        }
+      }
+      console.log(shotsCount)
 
-      return;
+      // Allows only 3 shots at a time per tank
+      if (!(shots.filter(i => i.tankid == [mytankid]).length > 2)) {
+        const shotid = random(0, 50000);
+        shots.push(new Shot(shotid, tanks[myTankIndex].tankid, tanks[myTankIndex].pos, 
+          tanks[myTankIndex].heading, tanks[myTankIndex].tankColor));
+        let newShot = { x: tanks[myTankIndex].pos.x, y: tanks[myTankIndex].pos.y, heading: tanks[myTankIndex].heading, 
+          tankColor: tanks[myTankIndex].tankColor, shotid: shotid, tankid: tanks[myTankIndex].tankid };
+        socket.emit('ClientNewShot', newShot);
+        // Play a shot sound
+        soundLib.playSound('tankfire');
+
+        return;
+      } else { return }
+
     } else if (keyCode == RIGHT_ARROW) {  // Move Right
       tanks[myTankIndex].setRotation(0.1);
     } else if (keyCode == LEFT_ARROW) {   // Move Left
       tanks[myTankIndex].setRotation(-0.1);
     } else if (keyCode == UP_ARROW) {     // Move Forward
-      tanks[myTankIndex].moveForward(1.0);
+      tanks[myTankIndex].moveForward(2.0);
     } else if (keyCode == DOWN_ARROW) {   // Move Back
       tanks[myTankIndex].moveForward(-1.0);
     }
@@ -203,10 +215,20 @@ function draw() {
     if(!tanks || myTankIndex < 0)
       return;
 
-    //    if(keyCode == RIGHT_ARROW || keyCode == LEFT_ARROW)
-    tanks[myTankIndex].setRotation(0.0);
-//    if(keyCode == UP_ARROW || keyCode == DOWN_ARROW)
-    tanks[myTankIndex].stopMotion();
+    if(keyCode == RIGHT_ARROW || keyCode == LEFT_ARROW) {
+      tanks[myTankIndex].turn();
+      if (keyIsDown(UP_ARROW)) {
+        tanks[myTankIndex].stopMotion();
+        tanks[myTankIndex].moveForward(2.0);
+      }
+      else if (keyIsDown(DOWN_ARROW)) {
+        tanks[myTankIndex].stopMotion();
+        tanks[myTankIndex].moveForward(-1.0);
+      }
+      tanks[myTankIndex].setRotation(0.0);
+    }
+    if(keyCode == UP_ARROW || keyCode == DOWN_ARROW)
+      tanks[myTankIndex].stopMotion();
   }
 
   
