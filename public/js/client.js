@@ -40,7 +40,7 @@ function setup() {
 
   // Set window size and push to the main screen
   // Good DEV size
-  win = { width: 800, height: 500 };
+  win = { width: 1000, height: 600 };
   // Good PROD size
 //  win = { width: 900, height: 700 };
   var canvas = createCanvas(win.width, win.height);
@@ -183,8 +183,8 @@ function draw() {
       }
       console.log(shotsCount)
 
-      // Allows only 3 shots at a time per tank
-      if (!(shots.filter(i => i.tankid == [mytankid]).length > 2)) {
+      // Allows only 5 shots at a time per tank
+      if (!(shots.filter(i => i.tankid == [mytankid]).length > 4)) {
         const shotid = random(0, 50000);
         shots.push(new Shot(shotid, tanks[myTankIndex].tankid, tanks[myTankIndex].pos, 
           tanks[myTankIndex].heading, tanks[myTankIndex].tankColor));
@@ -243,8 +243,26 @@ function draw() {
     myTankIndex = -1;
 
     // Create the new tank
-    // Make sure it's starting position is at least 20 pixels from the border of all walls
-    let startPos = createVector(Math.floor(Math.random()*(win.width-40)+20), Math.floor(Math.random()*(win.height-40)+20));
+    // Make sure it's starting position is at least 20 pixels from the border of all walls and not in possible lake areas
+    // left padding spawn
+    let spawn = Math.random()
+    let startPos
+    if (spawn < .25) {
+      startPos = createVector(Math.floor(Math.random()*(.25 * win.width - 40)+20), Math.floor(Math.random()*(win.height-40)+20));
+    }
+    // right padding spawn
+    else if (spawn < .50) {
+      startPos = createVector(Math.floor((Math.random()*(.25 * win.width - 40)+20) + (.75 * win.width)), Math.floor(Math.random()*(win.height-40)+20));
+    }
+    // top padding spawn
+    else if (spawn < .75) {
+      startPos = createVector(Math.floor(Math.random()*(win.width - 40)+20), Math.floor(Math.random()*(.25 * win.height-40)+20));
+    }
+    // bottom padding spawn
+    else {
+      startPos = createVector(Math.floor(Math.random()*(win.width - 40)+20), Math.floor((Math.random()*(.25 * win.height-40)+20) + (.75 * win.height)));
+    }
+    // let startPos = createVector(Math.floor(Math.random()*(win.width-40)+20), Math.floor(Math.random()*(win.height-40)+20));
     let startColor = color(Math.floor(Math.random()*255), Math.floor(Math.random()*255), Math.floor(Math.random()*255));
     let newTank = { x: startPos.x, y: startPos.y, heading: 0, tankColor: startColor, tankid: socketID, playername: PlayerName };
 
