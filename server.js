@@ -3,6 +3,7 @@
 //
 var express = require('express');
 var app = express();
+const { emit } = require('process');
 const request = require('request');
 //const Hapi = require( "hapi" );
 //const routes = require( "./routes" );
@@ -247,4 +248,14 @@ io.sockets.on('connection',
         // only send to the other clients (not the original sender)
         socket.broadcast.emit('ServerBuzzSawMove', data);
     });
+
+    socket.on('ClientStartPowerups', function (data) {
+      console.log('WERE HERE')
+
+      data = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
+
+      io.sockets.emit('ServerNewPowerup', data);
+
+    })
   });
+
