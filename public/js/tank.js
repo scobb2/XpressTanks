@@ -41,20 +41,21 @@ function Tank(startPos, tankColor, newtankid, playerName) {
     else {  // Draw Tank
       if (this.tankid == mytankid)
         stroke('white');
-      else 
+      else
         stroke('gray');
-        strokeWeight(2);
-        fill(this.tankColor);
-        rect(0, 0, tankWidth, tankHeight);
-        ellipse(0, -3, 14, 18);
-        rect(0, -20, 4, 20);
-        strokeWeight(6);
-        point(0, 0);
-        if(this.shield){
-          fill(0,0,255,.5)
-          ellipse(0,0,100,100)
-        }
-      
+      strokeWeight(2);
+      fill(this.tankColor);
+      rect(0, 0, tankWidth, tankHeight);
+      ellipse(0, -3, 14, 18);
+      rect(0, -20, 4, 20);
+      strokeWeight(6);
+      point(0, 0);
+      if (this.shield) {
+        this.invincible(this.shield)
+        fill(0, 0, 255, .5)
+        ellipse(0, 0, 100, 100)
+      }
+
     }
     pop();
 
@@ -74,6 +75,12 @@ function Tank(startPos, tankColor, newtankid, playerName) {
     var force = p5.Vector.fromAngle(this.heading);
     force.mult(a);
     this.vel.add(force);
+  }
+
+  this.invincible = function (shield) {
+    setTimeout(() => {
+      this.shield = false;
+    }, 5000);
   }
 
   this.stopMotion = function () {

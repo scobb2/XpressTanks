@@ -72,8 +72,6 @@ function setup() {
   socket.on('connect', function (data) {
     socketID = socket.io.engine.id;
     socket.emit('ClientNewJoin', socketID);
-    socket.emit('ClientStartPowerups')
-    socket.emit('ClientNewLake')
   });
 
   // Create a new Buzz
@@ -128,15 +126,16 @@ function draw() {
 
   // render power ups
   if (powerUps && powerUps.length > 0) {
+    powerUps.length = 1;
     for (var p = 0; p < powerUps.length; p++) {
       powerUps[p].render();
 
-      for (var t = tanks.length - 1; t >=0; t--) {
+      for (var t = tanks.length - 1; t >= 0; t--) {
         var dist = Math.sqrt(Math.pow((powerUps[p].pos.x - tanks[t].pos.x), 2) + Math.pow((powerUps[p].pos.y - tanks[t].pos.y), 2));
 
         if (dist < tankHitRadius) {
           tanks[t].shield = true;
-          powerUps.splice(p,1);
+          powerUps.splice(p, 1);
           return
         }
       }
@@ -165,19 +164,19 @@ function draw() {
 
         // Check for lake collision and don't let it go any further
         if (lake) {
-            dist = checkpoint(lake.x, lake.y, tanks[t].pos.x, tanks[t].pos.y, .5 * lake.width, .5 * lake.height)
-            if (dist > 1.1)
-              console.log("Outside lake");
-            // if tank gets too deep in water, it sinks
-            else if (dist < .7) {
-              tanks[t].destroyed = true;
-              console.log("death")
-            }
-            // when tank hits lake, it stops moving
-            else {
-              console.log("Inside lake");
-              tanks[t].stopMotion()
-            }
+          dist = checkpoint(lake.x, lake.y, tanks[t].pos.x, tanks[t].pos.y, .5 * lake.width, .5 * lake.height)
+          if (dist > 1.1)
+            console.log("Outside lake");
+          // if tank gets too deep in water, it sinks
+          else if (dist < .7) {
+            tanks[t].destroyed = true;
+            console.log("death")
+          }
+          // when tank hits lake, it stops moving
+          else {
+            console.log("Inside lake");
+            tanks[t].stopMotion()
+          }
         }
 
       }
@@ -212,20 +211,19 @@ function draw() {
 }
 
 // hit detection for lake
-        // h,k = ellipse midpoint
-        // x,y = tank midpoint
-        // a = 1/2 * width,     b = 1/2 * height
-function checkpoint(h , k , x , y , a , b)
-        {
-          console.log("h = " + h + " k = " + k + " x = " + x + " y = " + y + " a = " + a + " b = " + b)
-            // checking the equation of
-            // ellipse with the given point
-            var p = (parseInt(Math.pow((x - h), 2)) / parseInt(Math.pow(a, 2)))
-                    + (parseInt(Math.pow((y - k), 2)) / parseInt(Math.pow(b, 2)));
-        
-            console.log("p = " + p)
-            return p;
-        }
+// h,k = ellipse midpoint
+// x,y = tank midpoint
+// a = 1/2 * width,     b = 1/2 * height
+function checkpoint(h, k, x, y, a, b) {
+  console.log("h = " + h + " k = " + k + " x = " + x + " y = " + y + " a = " + a + " b = " + b)
+  // checking the equation of
+  // ellipse with the given point
+  var p = (parseInt(Math.pow((x - h), 2)) / parseInt(Math.pow(a, 2)))
+    + (parseInt(Math.pow((y - k), 2)) / parseInt(Math.pow(b, 2)));
+
+  console.log("p = " + p)
+  return p;
+}
 
 
 // Handling pressing a Keys
@@ -330,7 +328,9 @@ function ServerReadyAddNew(data) {
   // Send this new tank to the server to add to the list
   socket.emit('ClientNewTank', newTank);
   // this is respawning all tanks when a new powerup is availible
- 
+  socket.emit('ClientStartPowerups')
+  socket.emit('ClientNewLake')
+
 }
 
 // Server got new tank -- add it to the list
@@ -457,8 +457,6 @@ function ServerBuzzSawMove(data) {
 }
 function ServerNewPowerup(data) {
   jd = JSON.parse(data);
-  console.log(jd)
-  console.log('INSIDE POWERUP')
   //Check if powerUps array exists
   if (powerUps !== undefined) {
     //If Powerup is already in Array just return.
@@ -471,7 +469,6 @@ function ServerNewPowerup(data) {
   //Add power up to end of the array
   let c = color(255, 255, 0)
   powerUps.push(new Powerup(createVector(jd.x, jd.y), c, 1))
-  console.log(powerUps);
 }
 
 function ServerNewLake(data) {
@@ -485,5 +482,4 @@ function ServerNewLake(data) {
   }
   //Add lake to end of the array
   lake = new Lake(jd.x, jd.y, jd.height, jd.width)
-  console.log(lake);
-}
+  }
