@@ -1,8 +1,9 @@
 const minWidth = 100
 const minHeight = 100
 // A Lake Class
-function Lake(spawnPos, height, width) {
-    this.pos = spawnPos.copy();
+function Lake(x, y, height, width) {
+    this.x = x
+    this.y = y
     this.width = width + minWidth
     this.height = height + minHeight
 
@@ -11,6 +12,6 @@ function Lake(spawnPos, height, width) {
         // Draw lake
         strokeWeight(4);
         fill(176,224,230);
-        ellipse(this.pos.x, this.pos.y, this.width, this.height)
+        ellipse(this.x, this.y, this.width, this.height)
     }
 }
