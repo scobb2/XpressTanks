@@ -258,4 +258,8 @@ io.sockets.on('connection',
       data = '{"x":' + Math.floor(Math.random() * (700 - 200) + 250) + ',"y":' + Math.floor(Math.random() * (300 - 250) + 300) + ',"height":' +  Math.floor(Math.random() * (200 - 10) + 10) + ',"width":' + Math.floor(Math.random() * (200 - 10) + 10) + '}'
       io.sockets.emit('ServerNewLake', data);
     })
+
+    socket.on('ClientTankSink', function () {
+      io.sockets.emit('ServerTankRemove', socket.id);
+    })
   });

@@ -173,6 +173,7 @@ function draw() {
             // if tank gets too deep in water, it sinks
             else if (dist < .7) {
               tanks[t].destroyed = true;
+              socket.emit('ClientTankSink', socketID);
               console.log("death")
             }
             // when tank hits lake, it stops moving
