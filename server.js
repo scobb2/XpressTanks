@@ -255,7 +255,7 @@ io.sockets.on('connection',
     })
 
     socket.on('ClientNewLake', function (data) {
-      // data = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
+      data = '{"x":' + Math.floor(Math.random() * (800 - 200) + 200) + ',"y":' + Math.floor(Math.random() * (300 - 250) + 300) + ',"height":' +  Math.floor(Math.random() * (200 - 10) + 10) + ',"width":' + Math.floor(Math.random() * (200 - 10) + 10) + '}'
       io.sockets.emit('ServerNewLake', data);
     })
   });

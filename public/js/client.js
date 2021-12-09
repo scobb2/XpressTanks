@@ -280,6 +280,7 @@ function ServerReadyAddNew(data) {
 
   // Send this new tank to the server to add to the list
   socket.emit('ClientNewTank', newTank);
+  // this is respawning all tanks when a new powerup is availible
   socket.emit('ClientStartPowerups')
   socket.emit('ClientNewLake')
 }
@@ -414,7 +415,7 @@ function ServerNewPowerup(data) {
   if (powerUps !== undefined) {
     //If Powerup is already in Array just return.
     for (var i = 0; i < powerUps.length; i++) {
-      if (powerUps[i].id == data.id) {
+      if (powerUps[i].id == data.id) { // data.id is undefined tho?
         return
       }
     }
@@ -435,6 +436,7 @@ function ServerNewLake(data) {
         return
   }
   //Add lake to end of the array
-  lake = new Lake(1)
+  lake = new Lake(createVector(jd.x, jd.y), jd.height, jd.width)
+  lakeExists = true
   console.log(lake);
 }
