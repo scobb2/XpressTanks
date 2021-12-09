@@ -90,6 +90,10 @@ function draw() {
   else
     loopCount++;
 
+  if (lake) {
+    lake.render();
+  }
+
   // Process shots
   for (var i = shots.length - 1; i >= 0; i--) {
     shots[i].render();
@@ -142,9 +146,7 @@ function draw() {
       }
     }
   }
-  if (lake) {
-    lake.render();
-  }
+  
   // Process all the tanks by iterating through the tanks array
   if (tanks && tanks.length > 0) {
     for (var t = 0; t < tanks.length; t++) {
@@ -217,13 +219,13 @@ function draw() {
         // a = 1/2 * width,     b = 1/2 * height
 function checkpoint(h , k , x , y , a , b)
         {
-          console.log("h = " + h + " k = " + k + " x = " + x + " y = " + y + " a = " + a + " b = " + b)
+          // console.log("h = " + h + " k = " + k + " x = " + x + " y = " + y + " a = " + a + " b = " + b)
             // checking the equation of
             // ellipse with the given point
-            var p = (parseInt(Math.pow((x - h), 2)) / parseInt(Math.pow(a, 2)))
-                    + (parseInt(Math.pow((y - k), 2)) / parseInt(Math.pow(b, 2)));
+            var p = ((Math.pow((x - h), 2)) / (Math.pow(a, 2)))
+                    + ((Math.pow((y - k), 2)) / (Math.pow(b, 2)));
         
-            console.log("p = " + p)
+            // console.log("p = " + p)
             return p;
         }
 
@@ -328,9 +330,7 @@ function ServerReadyAddNew(data) {
   tanks.push(newTankObj);
 
   // Send this new tank to the server to add to the list
-  socket.emit('ClientNewTank', newTank);
-  // this is respawning all tanks when a new powerup is availible
- 
+  socket.emit('ClientNewTank', newTank); 
 }
 
 // Server got new tank -- add it to the list
@@ -476,8 +476,7 @@ function ServerNewPowerup(data) {
 
 function ServerNewLake(data) {
   jd = JSON.parse(data);
-  console.log(jd)
-  console.log('INSIDE LAKE')
+  // console.log(jd)
   //Check if lake array exists
   if (lake) {
     //If lake is already in Array just return.
