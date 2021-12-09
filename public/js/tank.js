@@ -1,4 +1,3 @@
-
 var tankWidth = 20;
 var tankHeight = 30;
 

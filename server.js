@@ -250,12 +250,12 @@ io.sockets.on('connection',
     });
 
     socket.on('ClientStartPowerups', function (data) {
-      console.log('WERE HERE')
-
       data = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
-
       io.sockets.emit('ServerNewPowerup', data);
+    })
 
+    socket.on('ClientNewLake', function (data) {
+      // data = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
+      io.sockets.emit('ServerNewLake', data);
     })
   });
-

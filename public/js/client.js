@@ -8,6 +8,7 @@ var mytankid;
 let tankHitRadius = 20.0;
 var myTankIndex = -1;
 var buzz = undefined;
+let lakeExists = false
 
 var socket;
 var oldTankx, oldTanky, oldTankHeading;
@@ -65,6 +66,7 @@ function setup() {
   socket.on('ServerBuzzSawNewChaser', ServerBuzzSawNewChaser);
   socket.on('ServerBuzzSawMove', ServerBuzzSawMove);
   socket.on('ServerNewPowerup', ServerNewPowerup);
+  socket.on('ServerNewLake', ServerNewLake);
 
   // Join (or start) a new game
   socket.on('connect', function (data) {
@@ -120,10 +122,14 @@ function draw() {
       }
     }
   }
+  // render power ups
   if (powerUps && powerUps.length > 0) {
     for (var p = 0; p < powerUps.length; p++) {
       powerUps[p].render();
     }
+  }
+  if (lakeExists) {
+    lake.render();
   }
   // Process all the tanks by iterating through the tanks array
   if (tanks && tanks.length > 0) {
@@ -275,6 +281,7 @@ function ServerReadyAddNew(data) {
   // Send this new tank to the server to add to the list
   socket.emit('ClientNewTank', newTank);
   socket.emit('ClientStartPowerups')
+  socket.emit('ClientNewLake')
 }
 
 // Server got new tank -- add it to the list
@@ -416,4 +423,18 @@ function ServerNewPowerup(data) {
   let c = color(255, 0, 0)
   powerUps.push(new Powerup(createVector(jd.x, jd.y), c, 1))
   console.log(powerUps);
+}
+
+function ServerNewLake(data) {
+  jd = JSON.parse(data);
+  console.log(jd)
+  console.log('INSIDE LAKE')
+  //Check if lake array exists
+  if (lakeExists) {
+    //If lake is already in Array just return.
+        return
+  }
+  //Add lake to end of the array
+  lake = new Lake(1)
+  console.log(lake);
 }
