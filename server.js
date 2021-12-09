@@ -266,4 +266,8 @@ io.sockets.on('connection',
     socket.on('ClientNewLake', function () {
       socket.broadcast.emit('ServerNewLake', ldata);
     })
+
+    socket.on('ClientTankSink', function () {
+      io.sockets.emit('ServerTankRemove', socket.id);
+    })
   });

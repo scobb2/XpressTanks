@@ -88,6 +88,10 @@ function draw() {
   else
     loopCount++;
 
+  if (lake) {
+    lake.render();
+  }
+
   // Process shots
   for (var i = shots.length - 1; i >= 0; i--) {
     shots[i].render();
@@ -141,9 +145,7 @@ function draw() {
       }
     }
   }
-  if (lake) {
-    lake.render();
-  }
+  
   // Process all the tanks by iterating through the tanks array
   if (tanks && tanks.length > 0) {
     for (var t = 0; t < tanks.length; t++) {
@@ -164,19 +166,20 @@ function draw() {
 
         // Check for lake collision and don't let it go any further
         if (lake) {
-          dist = checkpoint(lake.x, lake.y, tanks[t].pos.x, tanks[t].pos.y, .5 * lake.width, .5 * lake.height)
-          if (dist > 1.1)
-            console.log("Outside lake");
-          // if tank gets too deep in water, it sinks
-          else if (dist < .7) {
-            tanks[t].destroyed = true;
-            console.log("death")
-          }
-          // when tank hits lake, it stops moving
-          else {
-            console.log("Inside lake");
-            tanks[t].stopMotion()
-          }
+            dist = checkpoint(lake.x, lake.y, tanks[t].pos.x, tanks[t].pos.y, .5 * lake.width, .5 * lake.height)
+            if (dist > 1.1)
+              console.log("Outside lake");
+            // if tank gets too deep in water, it sinks
+            else if (dist < .7) {
+              tanks[t].destroyed = true;
+              socket.emit('ClientTankSink', socketID);
+              console.log("death")
+            }
+            // when tank hits lake, it stops moving
+            else {
+              console.log("Inside lake");
+              tanks[t].stopMotion()
+            }
         }
 
       }
@@ -211,19 +214,20 @@ function draw() {
 }
 
 // hit detection for lake
-// h,k = ellipse midpoint
-// x,y = tank midpoint
-// a = 1/2 * width,     b = 1/2 * height
-function checkpoint(h, k, x, y, a, b) {
-  console.log("h = " + h + " k = " + k + " x = " + x + " y = " + y + " a = " + a + " b = " + b)
-  // checking the equation of
-  // ellipse with the given point
-  var p = (parseInt(Math.pow((x - h), 2)) / parseInt(Math.pow(a, 2)))
-    + (parseInt(Math.pow((y - k), 2)) / parseInt(Math.pow(b, 2)));
-
-  console.log("p = " + p)
-  return p;
-}
+        // h,k = ellipse midpoint
+        // x,y = tank midpoint
+        // a = 1/2 * width,     b = 1/2 * height
+function checkpoint(h , k , x , y , a , b)
+        {
+          // console.log("h = " + h + " k = " + k + " x = " + x + " y = " + y + " a = " + a + " b = " + b)
+            // checking the equation of
+            // ellipse with the given point
+            var p = ((Math.pow((x - h), 2)) / (Math.pow(a, 2)))
+                    + ((Math.pow((y - k), 2)) / (Math.pow(b, 2)));
+        
+            // console.log("p = " + p)
+            return p;
+        }
 
 
 // Handling pressing a Keys
@@ -473,8 +477,7 @@ function ServerNewPowerup(data) {
 
 function ServerNewLake(data) {
   jd = JSON.parse(data);
-  console.log(jd)
-  console.log('INSIDE LAKE')
+  // console.log(jd)
   //Check if lake array exists
   if (lake) {
     //If lake is already in Array just return.
