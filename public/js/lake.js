@@ -1,6 +1,5 @@
 // A Lake Class
 function Lake(startPos) {
-    this.pos = startPos.copy();
     Math.floor(Math.random() * (max - min) + min);
     this.width = randomNum(10, 200)
     this.height = randomNum(10, 200)
