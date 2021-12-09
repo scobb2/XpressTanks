@@ -1,8 +1,10 @@
+const minWidth = 100
+const minHeight = 100
 // A Lake Class
 function Lake(spawnPos, height, width) {
     this.pos = spawnPos.copy();
-    this.width = width
-    this. height = height
+    this.width = width + minWidth
+    this.height = height + minHeight
 
     // Render - to render the lake to the screen
     this.render = function() {
