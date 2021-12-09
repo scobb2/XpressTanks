@@ -72,6 +72,8 @@ function setup() {
   socket.on('connect', function (data) {
     socketID = socket.io.engine.id;
     socket.emit('ClientNewJoin', socketID);
+    socket.emit('ClientStartPowerups')
+    socket.emit('ClientNewLake')
   });
 
   // Create a new Buzz
@@ -99,7 +101,7 @@ function draw() {
       // Look for hits with all tanks
       for (var t = tanks.length - 1; t >= 0; t--) {
         // As long as it's not the tank that fired the shot
-        if (shots[i].tankid == tanks[t].tankid)
+        if ((shots[i].tankid == tanks[t].tankid) || tanks[t].shield)
           continue;
         else {
           var dist = Math.sqrt(Math.pow((shots[i].pos.x - tanks[t].pos.x), 2) + Math.pow((shots[i].pos.y - tanks[t].pos.y), 2));
@@ -130,11 +132,10 @@ function draw() {
       powerUps[p].render();
 
       for (var t = tanks.length - 1; t >=0; t--) {
-        console.log("INSIDE LOOP 2")
-        console.log("Checking Tanks");
         var dist = Math.sqrt(Math.pow((powerUps[p].pos.x - tanks[t].pos.x), 2) + Math.pow((powerUps[p].pos.y - tanks[t].pos.y), 2));
 
         if (dist < tankHitRadius) {
+          tanks[t].shield = true;
           powerUps.splice(p,1);
           return
         }
@@ -329,8 +330,7 @@ function ServerReadyAddNew(data) {
   // Send this new tank to the server to add to the list
   socket.emit('ClientNewTank', newTank);
   // this is respawning all tanks when a new powerup is availible
-  socket.emit('ClientStartPowerups')
-  socket.emit('ClientNewLake')
+ 
 }
 
 // Server got new tank -- add it to the list
