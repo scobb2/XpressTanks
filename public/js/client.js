@@ -479,6 +479,8 @@ function ServerNewLake(data) {
   jd = JSON.parse(data);
   // console.log(jd)
   //Check if lake array exists
+  console.log("INSIDE LAKE")
+  console.log(lake)
   if (lake) {
     //If lake is already in Array just return.
     return

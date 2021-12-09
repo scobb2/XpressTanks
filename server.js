@@ -52,8 +52,8 @@ app.post('/GetEm', (req, res) => {
 // WebSocket Portion
 // WebSockets work with the HTTP server
 var io = require('socket.io')(server);
-var pdata;
-var ldata;
+var pdata = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
+var ldata = '{"x":' + Math.floor(Math.random() * (700 - 200) + 250) + ',"y":' + Math.floor(Math.random() * (300 - 250) + 300) + ',"height":' + Math.floor(Math.random() * (200 - 10) + 10) + ',"width":' + Math.floor(Math.random() * (200 - 10) + 10) + '}'
 
 // Register a callback function to run when we have an individual connection
 // This is run for each individual user that connects
@@ -227,11 +227,13 @@ io.sockets.on('connection',
         shots = [];
         tanks = [];
 
+        pdata = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
+        ldata = '{"x":' + Math.floor(Math.random() * (700 - 200) + 250) + ',"y":' + Math.floor(Math.random() * (300 - 250) + 300) + ',"height":' + Math.floor(Math.random() * (200 - 10) + 10) + ',"width":' + Math.floor(Math.random() * (200 - 10) + 10) + '}'
+
+
         // Finally, reset the clients
         io.sockets.emit('ServerResetAll', data);
          
-        pdata = '{"x":' + Math.floor(Math.random() * 599 + 1) + ',"y":' + Math.floor(Math.random() * 599 + 1) + '}'
-        ldata = '{"x":' + Math.floor(Math.random() * (700 - 200) + 250) + ',"y":' + Math.floor(Math.random() * (300 - 250) + 300) + ',"height":' + Math.floor(Math.random() * (200 - 10) + 10) + ',"width":' + Math.floor(Math.random() * (200 - 10) + 10) + '}'
 
 
       });
@@ -258,13 +260,13 @@ io.sockets.on('connection',
 
     socket.on('ClientStartPowerups', function () {
       console.log(pdata)
-      socket.broadcast.emit('ServerNewPowerup', pdata);
+      io.sockets.emit('ServerNewPowerup', pdata);
 
 
     })
 
     socket.on('ClientNewLake', function () {
-      socket.broadcast.emit('ServerNewLake', ldata);
+      io.sockets.emit('ServerNewLake', ldata);
     })
 
     socket.on('ClientTankSink', function () {
