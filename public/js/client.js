@@ -112,6 +112,7 @@ function draw() {
               x: shots[i].pos.x, y: shots[i].pos.y,
               shotid: shots[i].shotid, tankid: shots[i].tankid
             };
+            //Is this needed??
             socket.emit('ClientTankHit', shotData);
             tanks[t].destroyed = true;
             shots.splice(i, 1);
@@ -122,10 +123,22 @@ function draw() {
       }
     }
   }
+
   // render power ups
   if (powerUps && powerUps.length > 0) {
     for (var p = 0; p < powerUps.length; p++) {
       powerUps[p].render();
+
+      for (var t = tanks.length - 1; t >=0; t--) {
+        console.log("INSIDE LOOP 2")
+        console.log("Checking Tanks");
+        var dist = Math.sqrt(Math.pow((powerUps[p].pos.x - tanks[t].pos.x), 2) + Math.pow((powerUps[p].pos.y - tanks[t].pos.y), 2));
+
+        if (dist < tankHitRadius) {
+          powerUps.splice(p,1);
+          return
+        }
+      }
     }
   }
   if (lake) {
@@ -229,10 +242,12 @@ function keyPressed() {
     // Allows only 4 shots at a time per tank
     if (!(shots.filter(i => i.tankid == [mytankid]).length > 3)) {
       const shotid = random(0, 50000);
-      shots.push(new Shot(shotid, tanks[myTankIndex].tankid, tanks[myTankIndex].pos, 
+      shots.push(new Shot(shotid, tanks[myTankIndex].tankid, tanks[myTankIndex].pos,
         tanks[myTankIndex].heading, tanks[myTankIndex].tankColor));
-      let newShot = { x: tanks[myTankIndex].pos.x, y: tanks[myTankIndex].pos.y, heading: tanks[myTankIndex].heading, 
-        tankColor: tanks[myTankIndex].tankColor, shotid: shotid, tankid: tanks[myTankIndex].tankid };
+      let newShot = {
+        x: tanks[myTankIndex].pos.x, y: tanks[myTankIndex].pos.y, heading: tanks[myTankIndex].heading,
+        tankColor: tanks[myTankIndex].tankColor, shotid: shotid, tankid: tanks[myTankIndex].tankid
+      };
       socket.emit('ClientNewShot', newShot);
       // Play a shot sound
       soundLib.playSound('tankfire');
@@ -240,23 +255,23 @@ function keyPressed() {
       return;
     } else { return }
 
-    } else if (keyCode == RIGHT_ARROW) {  // Move Right
-      tanks[myTankIndex].setRotation(0.1);
-    } else if (keyCode == LEFT_ARROW) {   // Move Left
-      tanks[myTankIndex].setRotation(-0.1);
-    } else if (keyCode == UP_ARROW) {     // Move Forward
-      tanks[myTankIndex].moveForward(2.0);
-    } else if (keyCode == DOWN_ARROW) {   // Move Back
-      tanks[myTankIndex].moveForward(-1.0);
-    }
+  } else if (keyCode == RIGHT_ARROW) {  // Move Right
+    tanks[myTankIndex].setRotation(0.1);
+  } else if (keyCode == LEFT_ARROW) {   // Move Left
+    tanks[myTankIndex].setRotation(-0.1);
+  } else if (keyCode == UP_ARROW) {     // Move Forward
+    tanks[myTankIndex].moveForward(2.0);
+  } else if (keyCode == DOWN_ARROW) {   // Move Back
+    tanks[myTankIndex].moveForward(-1.0);
   }
+}
 
 // Release Key
 function keyReleased() {
   if (!tanks || myTankIndex < 0)
     return;
 
-  if(keyCode == RIGHT_ARROW || keyCode == LEFT_ARROW) {
+  if (keyCode == RIGHT_ARROW || keyCode == LEFT_ARROW) {
     tanks[myTankIndex].turn();
     if (keyIsDown(UP_ARROW)) {
       tanks[myTankIndex].stopMotion();
@@ -268,7 +283,7 @@ function keyReleased() {
     }
     tanks[myTankIndex].setRotation(0.0);
   }
-  if(keyCode == UP_ARROW || keyCode == DOWN_ARROW)
+  if (keyCode == UP_ARROW || keyCode == DOWN_ARROW)
     tanks[myTankIndex].stopMotion();
 
 }
@@ -281,29 +296,29 @@ function ServerReadyAddNew(data) {
   mytankid = undefined;
   myTankIndex = -1;
 
-    // Create the new tank
-    // Make sure it's starting position is at least 20 pixels from the border of all walls and not in possible lake areas
-    // left padding spawn
-    let spawn = Math.random()
-    let startPos
-    if (spawn < .25) {
-      startPos = createVector(Math.floor(Math.random()*(.25 * win.width - 40)+20), Math.floor(Math.random()*(win.height-40)+20));
-    }
-    // right padding spawn
-    else if (spawn < .50) {
-      startPos = createVector(Math.floor((Math.random()*(.25 * win.width - 40)+20) + (.75 * win.width)), Math.floor(Math.random()*(win.height-40)+20));
-    }
-    // top padding spawn
-    else if (spawn < .75) {
-      startPos = createVector(Math.floor(Math.random()*(win.width - 40)+20), Math.floor(Math.random()*(.25 * win.height-40)+20));
-    }
-    // bottom padding spawn
-    else {
-      startPos = createVector(Math.floor(Math.random()*(win.width - 40)+20), Math.floor((Math.random()*(.25 * win.height-40)+20) + (.75 * win.height)));
-    }
-    // let startPos = createVector(Math.floor(Math.random()*(win.width-40)+20), Math.floor(Math.random()*(win.height-40)+20));
-    let startColor = color(Math.floor(Math.random()*255), Math.floor(Math.random()*255), Math.floor(Math.random()*255));
-    let newTank = { x: startPos.x, y: startPos.y, heading: 0, tankColor: startColor, tankid: socketID, playername: PlayerName };
+  // Create the new tank
+  // Make sure it's starting position is at least 20 pixels from the border of all walls and not in possible lake areas
+  // left padding spawn
+  let spawn = Math.random()
+  let startPos
+  if (spawn < .25) {
+    startPos = createVector(Math.floor(Math.random() * (.25 * win.width - 40) + 20), Math.floor(Math.random() * (win.height - 40) + 20));
+  }
+  // right padding spawn
+  else if (spawn < .50) {
+    startPos = createVector(Math.floor((Math.random() * (.25 * win.width - 40) + 20) + (.75 * win.width)), Math.floor(Math.random() * (win.height - 40) + 20));
+  }
+  // top padding spawn
+  else if (spawn < .75) {
+    startPos = createVector(Math.floor(Math.random() * (win.width - 40) + 20), Math.floor(Math.random() * (.25 * win.height - 40) + 20));
+  }
+  // bottom padding spawn
+  else {
+    startPos = createVector(Math.floor(Math.random() * (win.width - 40) + 20), Math.floor((Math.random() * (.25 * win.height - 40) + 20) + (.75 * win.height)));
+  }
+  // let startPos = createVector(Math.floor(Math.random()*(win.width-40)+20), Math.floor(Math.random()*(win.height-40)+20));
+  let startColor = color(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255));
+  let newTank = { x: startPos.x, y: startPos.y, heading: 0, tankColor: startColor, tankid: socketID, playername: PlayerName };
 
   // Create the new tank and add it to the array
   mytankid = socketID;
@@ -466,7 +481,7 @@ function ServerNewLake(data) {
   //Check if lake array exists
   if (lake) {
     //If lake is already in Array just return.
-        return
+    return
   }
   //Add lake to end of the array
   lake = new Lake(jd.x, jd.y, jd.height, jd.width)
